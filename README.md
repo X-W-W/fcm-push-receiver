@@ -85,6 +85,25 @@ pnpm run build
 node example/index.ts
 ```
 
+## Local install smoke test
+
+If you want to verify the package still works after it is packed and installed as
+a dependency, use the local smoke test:
+
+1. Copy `firebase.template.json` to `firebase.json`
+2. Fill in your Firebase `apiKey`, `appId`, and `projectId`
+3. Run `pnpm run smoke:install`
+
+The smoke test builds the package, runs `npm pack`, installs the tarball into a
+temporary project, then verifies `register()` and `listen()` from the installed
+package. Output is masked so the printed token and key values are not shown in
+full.
+
+```bash
+cp firebase.template.json firebase.json
+pnpm run smoke:install
+```
+
 ## Local scripts
 
 Build the package first:

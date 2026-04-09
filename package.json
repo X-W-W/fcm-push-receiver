@@ -30,6 +30,7 @@
     "test:unit": "node --test test/unit/*.test.mjs",
     "test:e2e": "node --test test/e2e/*.test.mjs",
     "test": "pnpm run build && pnpm run test:unit && pnpm run test:e2e",
+    "smoke:install": "node ./scripts/smoke-install.mjs",
     "precommit": "lint-staged",
     "build": "sh scripts/build.sh"
   },
