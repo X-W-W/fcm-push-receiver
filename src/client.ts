@@ -62,10 +62,12 @@ class Client extends EventEmitter {
         await Client.init();
         await this._checkIn();
         this._connect();
+        // This can happen if the socket immediately closes after being created.
         if (!this._socket) {
             return;
         }
         await Parser.init();
+        // This can happen if the socket immediately closes after being created.
         if (!this._socket) {
             return;
         }
@@ -140,6 +142,7 @@ class Client extends EventEmitter {
             "useRmq2": true,
             "setting": [{ "name": "new_vc",
                 "value": "1" }],
+            // Ids of the notifications we have already received.
             "clientEvent": [],
             "receivedPersistentId": this._persistentIds
         };
@@ -186,6 +189,8 @@ class Client extends EventEmitter {
     private _onMessage ({ tag, object }: { "tag": number;
         "object": unknown; }) {
         if (tag === kLoginResponseTag) {
+            // Clear persistent ids after login because they were just sent to the
+            // server as part of the login request.
             this._persistentIds = [];
             return;
         }
@@ -218,6 +223,9 @@ class Client extends EventEmitter {
                 ):
                 case messageText.includes("crypto-key is missing"):
                 case messageText.includes("salt is missing"):
+                    // We occasionally fail to decrypt a message even though the
+                    // same keys continue to work for later notifications, so drop
+                    // this one and keep the stream moving.
                     console.warn(
                         `Message dropped as it could not be decrypted: ${messageText}`
                     );
@@ -228,7 +236,9 @@ class Client extends EventEmitter {
             }
         }
 
+        // Maintain persistentIds with the latest received value.
         this._persistentIds.push(object.persistentId);
+        // The consumer is responsible for persisting the persistentId.
         this.emit("ON_NOTIFICATION_RECEIVED", {
             "notification": message,
             "persistentId": object.persistentId

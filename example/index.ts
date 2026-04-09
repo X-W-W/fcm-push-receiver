@@ -71,11 +71,14 @@ async function loadOrRegisterCredentials (
 
     if (storedCredentials) {
         logUsingStoredCredentials();
+        // persistentIds avoids replaying notifications that were already
+        // acknowledged on previous runs.
         storedCredentials.persistentIds ??= [];
         return storedCredentials;
     }
 
     logRegisteringReceiver();
+    // Register once for a receiver, then persist the credentials for later runs.
     const credentials = await register(firebaseConfig);
     credentials.persistentIds = [];
     await persistCredentials(credentials);
@@ -96,9 +99,11 @@ async function readStoredCredentials (): Promise<ICredentials | null> {
 }
 
 function onNotification (credentials: ICredentials): TNotificationCb {
+    // Called whenever a new notification arrives from FCM.
     return function handleNotification ({ notification, persistentId }): void {
         logNotification(persistentId, notification);
 
+        // Keep persistentIds updated so future starts do not replay old messages.
         credentials.persistentIds ??= [];
         if (!credentials.persistentIds.includes(persistentId)) {
             credentials.persistentIds.push(persistentId);

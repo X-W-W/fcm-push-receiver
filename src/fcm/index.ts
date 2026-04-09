@@ -10,7 +10,10 @@ const FCM_ENDPOINT = "https://fcm.googleapis.com/fcm/send";
 const fidRegex = /^[cdef][\w-]{21}$/;
 
 function generateFirebaseFID () {
+    // A valid FID is 22 base64 characters (132 bits, or 16.5 bytes), so we
+    // generate 17 random bytes and trim the encoded form back to 22 chars.
     const fid = crypto.randomBytes(17);
+    // Replace the first 4 random bits with the constant FID header 0b0111.
     fid[0] = 0b01110000 + fid[0] % 0b00010000;
 
     const fidResult = fid.toString("base64")

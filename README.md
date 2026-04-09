@@ -57,6 +57,8 @@ function onNotification({ notification, persistentId }) {
 }
 ```
 
+Note: A receiver registration is intended for a single active listener. Running multiple listener processes with the same stored credentials can cause repeated disconnect/reconnect cycles.
+
 ## Local scripts
 
 Build the package first:

@@ -8,6 +8,8 @@ import { resolveAssetPath } from "../utils/module-path.js";
 import request from "../utils/request.js";
 import { waitFor } from "../utils/timeout.js";
 
+// Hack to fix PHONE_REGISTRATION_ERROR #17 when bundled with protobufjs.
+// https://github.com/dcodeIO/protobuf.js#browserify-integration
 protobuf.util.Long = Long;
 protobuf.configure();
 
