@@ -80,10 +80,11 @@
   "dependencies": {
     "http_ece": "^1.2.1",
     "long": "^5.2.3",
+    "node-fetch": "^3.3.2",
     "protobufjs": "^7.4.0",
     "uuid": "^11.0.4"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=16.20.0"
   }
 }

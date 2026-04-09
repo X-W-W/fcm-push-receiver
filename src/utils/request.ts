@@ -1,3 +1,4 @@
+import { resolveFetch } from "./fetch.js";
 import { waitFor } from "./timeout.js";
 
 const MAX_RETRY_TIMEOUT = 15;
@@ -64,7 +65,8 @@ async function retry<T> (retryCount: number, options: IRequestOptions): Promise<
 
 async function requestOnce<T> (options: IRequestOptions): Promise<T> {
     const headers = options.headers ? { ...options.headers } : {};
-    const response = await fetch(options.url, {
+    const fetchImpl = await resolveFetch();
+    const response = await fetchImpl(options.url, {
         "method": options.method ?? "GET",
         "headers": headers,
         "body": getRequestBody(options, headers)

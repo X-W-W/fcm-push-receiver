@@ -24,7 +24,8 @@ This package currently ships as native ESM only. Use `import`, not `require()`.
 
 ## Requirements
 
-- Node.js 18.18 or newer with native ESM support.
+- Runtime: Node.js 16.20 or newer with native ESM support. Node 18+ still uses the built-in `fetch`, while Node 16 and older Electron runtimes fall back to a bundled `node-fetch` dependency.
+- Maintenance and CI: Node.js 18.18 or newer is still recommended for developing in this repository and running the full verification workflow.
 - Firebase `apiKey`, `appId`, and `projectId` to register the receiver.
 - A Firebase server key only if you still want to exercise the legacy local send script. The corresponding legacy FCM send endpoint was deprecated and removed on June 20, 2024, so live success is not expected there.
 
