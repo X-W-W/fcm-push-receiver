@@ -47,17 +47,43 @@ const fcmToken = credentials.fcm.token;
 storeCredentials(credentials);
 sendTokenToBackendOrWhatever(fcmToken);
 
-const savedCredentials = getSavedCredentials();
-const persistentIds = getPersistentIds() ?? [];
-await listen({ ...savedCredentials, persistentIds }, onNotification);
+let savedCredentials = getSavedCredentials();
+if (savedCredentials.persistentIds == null) {
+  savedCredentials.persistentIds = getPersistentIds() ?? [];
+}
+
+await listen(savedCredentials, onNotification);
 
 function onNotification({ notification, persistentId }) {
-  updatePersistentIds([...persistentIds, persistentId]);
+  if (savedCredentials.persistentIds == null) {
+    savedCredentials.persistentIds = [];
+  }
+  if (!savedCredentials.persistentIds.includes(persistentId)) {
+    savedCredentials.persistentIds.push(persistentId);
+    updatePersistentIds(savedCredentials.persistentIds);
+  }
   display(notification);
 }
 ```
 
 Note: A receiver registration is intended for a single active listener. Running multiple listener processes with the same stored credentials can cause repeated disconnect/reconnect cycles.
+
+## Local receiver example
+
+For local testing, the quickest path is the bundled example:
+
+1. Copy `firebase.template.json` to `firebase.json`
+2. Fill in your Firebase `apiKey`, `appId`, and `projectId`
+3. Build the package
+4. Run `node example/index.ts`
+
+On the first run, the example registers a receiver, prints the full FCM token, and writes credentials to `storage.json`. Later runs reuse `storage.json` and reconnect with the same receiver credentials.
+
+```bash
+cp firebase.template.json firebase.json
+pnpm run build
+node example/index.ts
+```
 
 ## Local scripts
 
