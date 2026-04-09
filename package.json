@@ -1,32 +1,45 @@
 {
-  "name": "push-receiver-v2",
-  "version": "2.2.0",
-  "description":
-    "A module to subscribe to GCM/FCM and receive notifications within a node process. v2 is compatible with the latest FCM registration endpoints.",
-  "main": "src/index.js",
+  "name": "fcm-push-receiver",
+  "version": "2.2.1",
+  "description": "A module to subscribe to GCM/FCM and receive notifications within a node process. v2 is compatible with the latest FCM registration endpoints.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "start": "node scripts/listen",
-    "register": "node scripts/register",
-    "send": "node scripts/send",
-    "pretty":
-      "prettier-eslint --single-quote --trailing-comma es5 --write \"**/*.js\" \"**/*.json\"",
-    "pretty:check":
-      "prettier-eslint --single-quote --trailing-comma es5 --list-different --log-level silent \"**/*.js\" \"**/*.json\"",
-    "lint": "eslint 'src/**/*.js'",
-    "lint:fix": "eslint 'src/**/*.js' --fix",
-    "test": "jest",
-    "precommit": "lint-staged"
+    "start": "node ./scripts/listen/index.js",
+    "register": "node ./scripts/register/index.js",
+    "send": "node ./scripts/send/index.js",
+    "pretty": "prettier-eslint --single-quote --trailing-comma es5 --write \"**/*.js\" \"**/*.json\"",
+    "pretty:check": "prettier-eslint --single-quote --trailing-comma es5 --list-different --log-level silent \"**/*.js\" \"**/*.json\"",
+    "lint": "eslint \"src/**/*.ts\" \"example/**/*.ts\" \"test/**/*.mjs\"",
+    "lint:fix": "eslint \"src/**/*.ts\" \"example/**/*.ts\" \"test/**/*.mjs\" --fix",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "node --test test/unit/*.test.mjs",
+    "test:e2e": "node --test test/e2e/*.test.mjs",
+    "test": "pnpm run build && pnpm run test:unit && pnpm run test:e2e",
+    "precommit": "lint-staged",
+    "build": "sh scripts/build.sh"
   },
   "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "prettier-eslint --single-quote --trailing-comma es5 --write"
-    ],
-    "*.json": ["prettier-eslint --single-quote --trailing-comma es5 --write"]
+    "*.ts": [
+      "eslint --fix"
+    ]
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/javajuice1337/push-receiver-v2.git"
+    "url": "git+ssh://git@github.com:X-W-W/fcm-push-receiver.git"
   },
   "keywords": [
     "push",
@@ -38,31 +51,37 @@
     "electron",
     "receiver"
   ],
-  "author": "javajuice1337",
+  "author": "XianWenwei",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/javajuice1337/push-receiver-v2/issues"
+    "url": "https://github.com/X-W-W/fcm-push-receiver/issues"
   },
-  "homepage": "https://github.com/javajuice1337/push-receiver-v2#readme",
+  "homepage": "https://github.com/X-W-W/fcm-push-receiver#readme",
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "eslint": "^4.4.1",
-    "eslint-plugin-jest": "^20.0.3",
+    "@eslint/js": "^9.17.0",
+    "@stylistic/eslint-plugin-ts": "^2.12.1",
+    "@types/node": "^22.10.5",
+    "eslint": "^9.17.0",
+    "esno": "^4.8.0",
+    "globals": "^15.14.0",
     "http-proxy": "^1.16.2",
     "husky": "^0.14.3",
-    "jest": "^22.2.2",
     "lint-staged": "^6.1.0",
-    "prettier": "^1.6.1",
-    "prettier-eslint": "^7.0.0",
-    "prettier-eslint-cli": "^4.3.0",
-    "yargs": "^10.0.3"
+    "prettier": "^3.4.2",
+    "prettier-eslint": "^16.3.0",
+    "prettier-eslint-cli": "^8.0.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.1",
+    "yargs": "^17.7.2"
   },
   "dependencies": {
-    "http_ece": "^1.0.5",
-    "long": "^3.2.0",
-    "protobufjs": "^6.8.0",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.1",
-    "uuid": "^3.1.0"
+    "http_ece": "^1.2.1",
+    "long": "^5.2.3",
+    "protobufjs": "^7.4.0",
+    "uuid": "^11.0.4"
+  },
+  "engines": {
+    "node": ">=18.18.0"
   }
 }

@@ -1,40 +1,47 @@
-// Note: The send endpoint is deprecated and removed as of June 20, 2024: https://firebase.google.com/support/faq#fcm-depr-features
+function getArgValue (name) {
+    const argv = process.argv.slice(2);
+    const prefix = `--${name}=`;
+    const inline = argv.find(argument => argument.startsWith(prefix));
 
-const request = require('request-promise');
-const argv = require('yargs').argv;
+    if (inline) {
+        return inline.slice(prefix.length);
+    }
 
-const serverKey = argv.serverKey;
-const token = argv.token;
+    const index = argv.indexOf(`--${name}`);
+    return index >= 0 ? argv[index + 1] : undefined;
+}
+
+const serverKey = getArgValue("serverKey");
+const token = getArgValue("token");
 
 if (!serverKey) {
-  console.error('Missing serverKey argument');
-  return;
-}
+    console.error("Missing serverKey argument");
+} else if (!token) {
+    console.error("Missing token argument");
+} else {
+    try {
+        const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+            "method": "POST",
+            "headers": {
+                "Authorization": `key=${serverKey}`,
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify({
+                "to": token,
+                "notification": {
+                    "title": "Hello world",
+                    "body": "Test"
+                }
+            })
+        });
+        const payload = await response.json();
 
-if (!token) {
-  console.error('Missing token argument');
-  return;
-}
+        if (!response.ok) {
+            throw new Error(`Send request failed with ${response.status}: ${JSON.stringify(payload)}`);
+        }
 
-(async () => {
-  try {
-    const response = await request({
-      method : 'POST',
-      url    : 'https://fcm.googleapis.com/fcm/send',
-      json   : true,
-      body   : {
-        to           : token,
-        notification : {
-          title : 'Hello world',
-          body  : 'Test',
-        },
-      },
-      headers : {
-        Authorization : `key=${serverKey}`,
-      },
-    });
-    console.log(response);
-  } catch (e) {
-    console.error(e.message);
-  }
-})();
+        console.log(payload);
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+    }
+}

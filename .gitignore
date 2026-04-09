@@ -7,3 +7,5 @@ storage.json
 web/
 .esm-cache
 test/keys.js
+dist
+firebase.json

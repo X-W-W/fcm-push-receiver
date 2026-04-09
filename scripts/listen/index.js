@@ -1,11 +1,9 @@
-const { listen } = require('../../src');
+import { listen } from "../../dist/index.js";
 
-(async () => {
-  try {
+try {
     await listen();
-    console.log('Connected');
-  } catch (e) {
-    console.error('Error during notification listening');
-    console.error(e);
-  }
-})();
+    console.log("Connected");
+} catch (error) {
+    console.error("Error during notification listening");
+    console.error(error instanceof Error ? error.message : error);
+}
