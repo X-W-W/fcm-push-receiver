@@ -5,6 +5,14 @@ import type {
     IFirebaseConfig,
     TNotificationCb
 } from "../dist/types.js";
+import {
+    attachLifecycleLogging,
+    logNotification,
+    logReceiverReady,
+    logRegisteringReceiver,
+    logStoredFreshCredentials,
+    logUsingStoredCredentials
+} from "./runtime.mjs";
 
 const FIREBASE_CONFIG_URL = new URL("../firebase.json", import.meta.url);
 const FIREBASE_TEMPLATE_URL = new URL(
@@ -20,9 +28,10 @@ async function main (): Promise<void> {
     validateFirebaseConfig(firebaseConfig);
 
     const credentials = await loadOrRegisterCredentials(firebaseConfig);
-    console.log("Listening for notifications with token:", credentials.fcm.token);
+    logReceiverReady(credentials.fcm.token);
 
-    await listen(credentials, onNotification(credentials));
+    const client = await listen(credentials, onNotification(credentials));
+    attachLifecycleLogging(client);
 }
 
 async function loadFirebaseConfig (): Promise<IFirebaseConfig> {
@@ -61,16 +70,16 @@ async function loadOrRegisterCredentials (
     const storedCredentials = await readStoredCredentials();
 
     if (storedCredentials) {
-        console.log("Using credentials from storage.json");
+        logUsingStoredCredentials();
         storedCredentials.persistentIds ??= [];
         return storedCredentials;
     }
 
-    console.log("No storage.json found. Registering a new receiver...");
+    logRegisteringReceiver();
     const credentials = await register(firebaseConfig);
     credentials.persistentIds = [];
     await persistCredentials(credentials);
-    console.log("Stored fresh receiver credentials in storage.json");
+    logStoredFreshCredentials();
     return credentials;
 }
 
@@ -88,8 +97,7 @@ async function readStoredCredentials (): Promise<ICredentials | null> {
 
 function onNotification (credentials: ICredentials): TNotificationCb {
     return function handleNotification ({ notification, persistentId }): void {
-        console.log("Notification received");
-        console.log(notification);
+        logNotification(persistentId, notification);
 
         credentials.persistentIds ??= [];
         if (!credentials.persistentIds.includes(persistentId)) {

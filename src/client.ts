@@ -1,5 +1,4 @@
 import EventEmitter from "node:events";
-import net from "node:net";
 import tls from "node:tls";
 import Long from "long";
 import protobuf from "protobufjs";
@@ -87,14 +86,17 @@ class Client extends EventEmitter {
     }
 
     private _connect () {
-        this._socket = new tls.TLSSocket(new net.Socket());
+        this._socket = tls.connect({
+            "host": HOST,
+            "port": PORT,
+            "servername": HOST
+        }, () => {
+            this._socket?.write(this._loginBuffer());
+        });
         this._socket.setKeepAlive(true);
         this._socket.on("connect", this._onSocketConnect);
         this._socket.on("close", this._onSocketClose);
         this._socket.on("error", this._onSocketError);
-        this._socket.connect({ "host": HOST,
-            "port": PORT });
-        this._socket.write(this._loginBuffer());
     }
 
     private _destroy () {
