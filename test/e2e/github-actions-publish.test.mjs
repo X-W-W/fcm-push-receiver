@@ -14,6 +14,10 @@ test("publish workflow is manually triggered and uses trusted publishing", async
     assert.match(workflowSource, /actions\/setup-node@v5/);
     assert.match(workflowSource, /github\.ref == 'refs\/heads\/master'/);
     assert.match(workflowSource, /id-token:\s*write/);
+    assert.match(workflowSource, /npm install -g npm@\^11\.5\.1/);
+    assert.match(workflowSource, /node -v/);
+    assert.match(workflowSource, /npm -v/);
+    assert.match(workflowSource, /pnpm -v/);
     assert.match(workflowSource, /pnpm run build/);
     assert.match(workflowSource, /pnpm run typecheck/);
     assert.match(workflowSource, /pnpm run lint/);
