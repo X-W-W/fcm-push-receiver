@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -35,6 +35,19 @@ test("compiled package exports the public API", async () => {
         Object.keys(pkg).sort(),
         ["listen", "register"]
     );
+});
+
+test("build removes stale artifacts from dist before compiling", () => {
+    const stalePath = path.join(repoRoot, "dist/should-be-removed.txt");
+    writeFileSync(stalePath, "stale\n", "utf8");
+
+    const result = spawnSync("pnpm", ["run", "build"], {
+        "cwd": repoRoot,
+        "encoding": "utf8"
+    });
+
+    assert.equal(result.status, 0);
+    assert.equal(existsSync(stalePath), false);
 });
 
 test("register script runs against compiled output without module loader errors", () => {
