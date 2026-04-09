@@ -12,9 +12,9 @@ test("publish workflow is manually triggered and uses trusted publishing", async
     assert.match(workflowSource, /FORCE_JAVASCRIPT_ACTIONS_TO_NODE24:\s*true/);
     assert.match(workflowSource, /actions\/checkout@v5/);
     assert.match(workflowSource, /actions\/setup-node@v5/);
+    assert.match(workflowSource, /node-version:\s*24/);
     assert.match(workflowSource, /github\.ref == 'refs\/heads\/master'/);
     assert.match(workflowSource, /id-token:\s*write/);
-    assert.match(workflowSource, /npm install -g npm@\^11\.5\.1/);
     assert.match(workflowSource, /node -v/);
     assert.match(workflowSource, /npm -v/);
     assert.match(workflowSource, /pnpm -v/);
@@ -23,6 +23,7 @@ test("publish workflow is manually triggered and uses trusted publishing", async
     assert.match(workflowSource, /pnpm run lint/);
     assert.match(workflowSource, /pnpm run test/);
     assert.match(workflowSource, /npm publish/);
+    assert.doesNotMatch(workflowSource, /npm install -g npm@\^11\.5\.1/);
     assert.doesNotMatch(workflowSource, /NPM_TOKEN/);
 });
 
