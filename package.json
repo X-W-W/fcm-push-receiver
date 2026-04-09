@@ -1,6 +1,7 @@
 {
   "name": "fcm-push-receiver",
   "version": "2.2.1",
+  "packageManager": "pnpm@10.30.3",
   "description": "A module to subscribe to GCM/FCM and receive notifications within a node process. v2 is compatible with the latest FCM registration endpoints.",
   "type": "module",
   "main": "./dist/index.js",

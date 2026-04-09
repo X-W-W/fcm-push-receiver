@@ -9,6 +9,9 @@ test("publish workflow is manually triggered and uses NPM_TOKEN", async () => {
     );
 
     assert.match(workflowSource, /workflow_dispatch:/);
+    assert.match(workflowSource, /FORCE_JAVASCRIPT_ACTIONS_TO_NODE24:\s*true/);
+    assert.match(workflowSource, /actions\/checkout@v5/);
+    assert.match(workflowSource, /actions\/setup-node@v5/);
     assert.match(workflowSource, /github\.ref == 'refs\/heads\/master'/);
     assert.match(workflowSource, /pnpm run build/);
     assert.match(workflowSource, /pnpm run typecheck/);
@@ -16,4 +19,14 @@ test("publish workflow is manually triggered and uses NPM_TOKEN", async () => {
     assert.match(workflowSource, /pnpm run test/);
     assert.match(workflowSource, /npm publish/);
     assert.match(workflowSource, /NPM_TOKEN/);
+});
+
+test("package metadata declares an explicit pnpm version", async () => {
+    const packageSource = await readFile(
+        new URL("../../package.json", import.meta.url),
+        "utf8"
+    );
+    const pkg = JSON.parse(packageSource);
+
+    assert.match(pkg.packageManager ?? "", /^pnpm@\d+\.\d+\.\d+$/);
 });
