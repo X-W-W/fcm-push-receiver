@@ -4,11 +4,15 @@ const MAX_RETRY_TIMEOUT = 15;
 const RETRY_STEP = 5;
 const MAX_RETRY_COUNT = 3;
 
+type TJsonBody = Record<string, unknown>;
+type TBinaryBody = ArrayBuffer | ArrayBufferView;
+type TRequestBody = BodyInit | TBinaryBody | TJsonBody;
+
 export interface IRequestOptions {
     "url": string;
     "method"?: string;
     "headers"?: Record<string, string>;
-    "body"?: BodyInit | Record<string, unknown>;
+    "body"?: TRequestBody;
     "json"?: boolean;
     "form"?: Record<string, string>;
     "encoding"?: null;
@@ -114,8 +118,12 @@ function getRequestBody (options: IRequestOptions, headers: Record<string, strin
     return options.body as BodyInit | undefined;
 }
 
-function isJsonObject (value: IRequestOptions["body"]): value is Record<string, unknown> {
-    return Boolean(value) && typeof value === "object" && !Buffer.isBuffer(value) && !(value instanceof Uint8Array) && !(value instanceof ArrayBuffer);
+function isJsonObject (value: IRequestOptions["body"]): value is TJsonBody {
+    return Boolean(value)
+        && typeof value === "object"
+        && !Buffer.isBuffer(value)
+        && !(value instanceof ArrayBuffer)
+        && !ArrayBuffer.isView(value);
 }
 
 function setHeaderIfMissing (headers: Record<string, string>, key: string, value: string) {
